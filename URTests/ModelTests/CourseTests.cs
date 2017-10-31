@@ -8,9 +8,25 @@ namespace UniversityRegistrar.Tests
   [TestClass]
   public class CourseTests : IDisposable
   {
-        public CourseTests()
-        {
-            DBConfiguration.ConnectionString = "server=localhost;user id=root;password=root;port=8889 ;database=todo_test;";
-        }
+    public CourseTests()
+    {
+      DBConfiguration.ConnectionString = "server=localhost;user id=root;password=root;port=8889 ;database=ur_test;";
+    }
 
-        [TestMethod]
+    [TestMethod]
+    public void GetAll_CoursesEmptyAtFirst_0()
+    {
+      //Arrange, Act
+      int result = Course.GetAll().Count;
+
+      //Assert
+      Assert.AreEqual(0, result);
+    }
+
+    public void Dispose()
+    {
+      Student.DeleteAll();
+      Course.DeleteAll();
+    }
+  }
+}
