@@ -28,7 +28,7 @@ namespace UniversityRegistrar.Models
         Student newStudent = (Student) otherStudent;
         bool idEquality = (this.GetId() == newStudent.GetId());
         bool nameEquality = (this.GetName() == newStudent.GetName());
-        bool enrollmentEquality = this.GetEnrollment() == newStudent.GetEnrollment();
+        bool enrollmentEquality = (this.GetEnrollment() == newStudent.GetEnrollment());
         return (idEquality && nameEquality && enrollmentEquality);
       }
     }
@@ -51,6 +51,33 @@ namespace UniversityRegistrar.Models
     public string GetEnrollment()
     {
       return _enrollment;
+    }
+
+    public void Save()
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"INSERT INTO student (name, enrollment) VALUES (@name, @enrollment);";
+
+      MySqlParameter name = new MySqlParameter();
+      name.ParameterName = "@name";
+      name.Value = this._name;
+      cmd.Parameters.Add(name);
+
+      MySqlParameter enrollment = new MySqlParameter();
+      enrollment.ParameterName = "@enrollment";
+      enrollment.Value = this._enrollment;
+      cmd.Parameters.Add(enrollment);
+
+      cmd.ExecuteNonQuery();
+      _id = (int) cmd.LastInsertedId;
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
     }
 
     public static List<Student> GetAll()

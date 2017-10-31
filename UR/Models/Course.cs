@@ -49,6 +49,34 @@ namespace UniversityRegistrar.Models
       return _id;
     }
 
+    public void Save()
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"INSERT INTO course (name, number) VALUES (@name, @coursenum);";
+
+      MySqlParameter name = new MySqlParameter();
+      name.ParameterName = "@name";
+      name.Value = this._name;
+      cmd.Parameters.Add(name);
+
+      MySqlParameter number = new MySqlParameter();
+      name.ParameterName = "@coursenum";
+      name.Value = this._number;
+      cmd.Parameters.Add(number);
+
+      cmd.ExecuteNonQuery();
+      _id = (int) cmd.LastInsertedId;
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+
+    }
+
     public static List<Course> GetAll()
     {
       List<Course> allCourses = new List<Course> {};
@@ -68,7 +96,7 @@ namespace UniversityRegistrar.Models
       conn.Close();
       if (conn != null)
       {
-          conn.Dispose();
+        conn.Dispose();
       }
       return allCourses;
     }
