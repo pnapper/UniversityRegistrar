@@ -1,0 +1,12 @@
+<h1>Add Student for @Model.GetName()</h1>
+
+<form action="/@Model.GetName()/@Model.GetId()/studentlist" method="post">
+  <label for="student-name">New Student</label>
+  <input type="text" name="student-name" class="form-control">
+  <label for ="student-enrollment">Enrollment Date</label>
+  <input type="date" name="student-enrollment" class="form-control">
+  <button type="submit" name="button">Add Student</button>
+</form>
+
+<a href="/@Model.GetName()/@Model.GetId()/studentlist">View Student List</a><br>
+<a href="/">HomePage</a>

@@ -6,13 +6,13 @@ namespace UniversityRegistrar.Models
 {
   public class Course
   {
-    private string _name;
-    private string _number;
+    private string _courseName;
+    private string _courseNumber;
     private int _id;
-    public Course(string name, string number, int id = 0)
+    public Course(string courseName, string courseNumber, int id = 0)
     {
-      _name = name;
-      _number = number;
+      _courseName = courseName;
+      _courseNumber = courseNumber;
       _id = id;
     }
 
@@ -34,47 +34,19 @@ namespace UniversityRegistrar.Models
       return this.GetId().GetHashCode();
     }
 
-    public string GetName()
+    public string GetCourseName()
     {
-      return _name;
+      return _courseName;
     }
 
-    public string GetNumber()
+    public string GetCourseNumber()
     {
-      return _number;
+      return _courseNumber;
     }
 
     public int GetId()
     {
       return _id;
-    }
-
-    public void Save()
-    {
-      MySqlConnection conn = DB.Connection();
-      conn.Open();
-
-      var cmd = conn.CreateCommand() as MySqlCommand;
-      cmd.CommandText = @"INSERT INTO course (name, number) VALUES (@name, @coursenum);";
-
-      MySqlParameter name = new MySqlParameter();
-      name.ParameterName = "@name";
-      name.Value = this._name;
-      cmd.Parameters.Add(name);
-
-      MySqlParameter number = new MySqlParameter();
-      name.ParameterName = "@coursenum";
-      name.Value = this._number;
-      cmd.Parameters.Add(number);
-
-      cmd.ExecuteNonQuery();
-      _id = (int) cmd.LastInsertedId;
-      conn.Close();
-      if (conn != null)
-      {
-        conn.Dispose();
-      }
-
     }
 
     public static List<Course> GetAll()
@@ -100,6 +72,65 @@ namespace UniversityRegistrar.Models
       }
       return allCourses;
     }
+
+    public void Save()
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"INSERT INTO course (name, course_number) VALUES (@courseName, @courseNumber);";
+
+      MySqlParameter courseName = new MySqlParameter();
+      courseName.ParameterName = "@courseName";
+      courseName.Value = this._courseName;
+      cmd.Parameters.Add(courseName);
+
+      MySqlParameter courseNumber = new MySqlParameter();
+      courseNumber.ParameterName = "@courseNumber";
+      courseNumber.Value = this._courseNumber;
+      cmd.Parameters.Add(courseNumber);
+
+      cmd.ExecuteNonQuery();
+      _id = (int) cmd.LastInsertedId;
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+    }
+
+    public static Course Find(int id)
+  {
+    MySqlConnection conn = DB.Connection();
+    conn.Open();
+    var cmd = conn.CreateCommand() as MySqlCommand;
+    cmd.CommandText = @"SELECT * FROM course WHERE id = (@searchId);";
+
+    MySqlParameter searchId = new MySqlParameter();
+    searchId.ParameterName = "@searchId";
+    searchId.Value = id;
+    cmd.Parameters.Add(searchId);
+
+    var rdr = cmd.ExecuteReader() as MySqlDataReader;
+    int CourseId = 0;
+    string CourseName = "";
+    string CourseNumber = "";
+
+    while(rdr.Read())
+    {
+      CourseId = rdr.GetInt32(0);
+      CourseName = rdr.GetString(1);
+      CourseNumber = rdr.GetString(2);
+    }
+    Course newCourse = new Course(CourseName, CourseNumber, CourseId);
+    conn.Close();
+    if (conn != null)
+    {
+      conn.Dispose();
+    }
+    return newCourse;
+  }
 
     public static void DeleteAll()
     {

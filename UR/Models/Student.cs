@@ -53,6 +53,30 @@ namespace UniversityRegistrar.Models
       return _enrollment;
     }
 
+    public static List<Student> GetAll()
+    {
+      List<Student> allStudents = new List<Student> {};
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"SELECT * FROM student;";
+      var rdr = cmd.ExecuteReader() as MySqlDataReader;
+      while(rdr.Read())
+      {
+        int studentId = rdr.GetInt32(0);
+        string studentName = rdr.GetString(1);
+        string studentEnrollment = rdr.GetString(2);
+        Student newStudent = new Student(studentName, studentEnrollment, studentId);
+        allStudents.Add(newStudent);
+      }
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+      return allStudents;
+    }
+
     public void Save()
     {
       MySqlConnection conn = DB.Connection();
@@ -80,29 +104,40 @@ namespace UniversityRegistrar.Models
       }
     }
 
-    public static List<Student> GetAll()
+    public static Student Find(int id)
     {
-      List<Student> allStudents = new List<Student> {};
       MySqlConnection conn = DB.Connection();
       conn.Open();
       var cmd = conn.CreateCommand() as MySqlCommand;
-      cmd.CommandText = @"SELECT * FROM student;";
+      cmd.CommandText = @"SELECT * FROM student WHERE id = (@searchId);";
+
+      MySqlParameter searchId = new MySqlParameter();
+      searchId.ParameterName = "@searchId";
+      searchId.Value = id;
+      cmd.Parameters.Add(searchId);
+
       var rdr = cmd.ExecuteReader() as MySqlDataReader;
-      while(rdr.Read())
+
+      int studentId = 0;
+      string studentName = "";
+      string studentEnrollment = "";
+
+      while (rdr.Read())
       {
-        int studentId = rdr.GetInt32(0);
-        string studentName = rdr.GetString(1);
-        string studentEnrollment = rdr.GetString(2);
-        Student newStudent = new Student(studentName, studentEnrollment, studentId);
-        allStudents.Add(newStudent);
+        studentId = rdr.GetInt32(0);
+        studentName = rdr.GetString(1);
+        studentEnrollment = rdr.GetString(2);
       }
+
+      Student newStudent= new Student(studentName, studentEnrollment, studentId);
       conn.Close();
       if (conn != null)
       {
         conn.Dispose();
       }
-      return allStudents;
+      return newStudent;
     }
+
 
     public static void DeleteAll()
     {

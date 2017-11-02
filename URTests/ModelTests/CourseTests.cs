@@ -49,6 +49,36 @@ namespace UniversityRegistrar.Tests
         CollectionAssert.AreEqual(testList, result);
       }
 
+      [TestMethod]
+      public void Save_DatabaseAssignsIdToCourse_Id()
+      {
+        //Arrange
+        Course testCourse = new Course("Trad-Harm 3", "Music 101");
+        testCourse.Save();
+
+        //Act
+        Course savedCourse = Course.GetAll()[0];
+
+        int result = savedCourse.GetId();
+        int testId = testCourse.GetId();
+
+        //Assert
+        Assert.AreEqual(testId, result);
+      }
+
+      [TestMethod]
+      public void Find_FindsCourseInDatabase_Course()
+      {
+        //Arrange
+        Course testCourse = new Course("Trad-Harm 3", "Music 101");
+        testCourse.Save();
+
+        //Act
+        Course foundCourse = Course.Find(testCourse.GetId());
+
+        //Assert
+        Assert.AreEqual(testCourse, foundCourse);
+      }
 
     public void Dispose()
     {

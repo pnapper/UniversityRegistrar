@@ -56,5 +56,36 @@ namespace UniversityRegistrar.Tests
       //Assert
       CollectionAssert.AreEqual(testList, result);
     }
+
+    [TestMethod]
+    public void Save_AssignsIdToObject_id()
+    {
+      //Arrange
+      Student testStudent = new Student("Joe Blow", "2017-01-01", 1);
+      testStudent.Save();
+
+      //Act
+      Student savedStudent = Student.GetAll()[0];
+
+      int result = savedStudent.GetId();
+      int testId = testStudent.GetId();
+
+      //Assert
+      Assert.AreEqual(testId, result);
+    }
+
+    [TestMethod]
+    public void Find_FindsStudentInDatabase_Student()
+    {
+      //Arrange
+      Student testStudent = new Student("Joe Blow", "2017-01-01", 1);
+      testStudent.Save();
+
+      //Act
+      Student result = Student.Find(testStudent.GetId());
+
+      //Assert
+      Assert.AreEqual(testStudent, result);
+    }
   }
 }
