@@ -132,6 +132,84 @@ namespace UniversityRegistrar.Models
     return newCourse;
   }
 
+  public List<Student> GetStudents()
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"SELECT student.* FROM course
+      JOIN course_student ON (course.id = course_student.course_id)
+      JOIN student ON (course_student.student_id = student.id)
+      WHERE course.id = @CourseId;";
+
+      MySqlParameter courseIdParameter = new MySqlParameter();
+      courseIdParameter.ParameterName = "@CourseId";
+      courseIdParameter.Value = _id;
+      cmd.Parameters.Add(courseIdParameter);
+
+      var rdr = cmd.ExecuteReader() as MySqlDataReader;
+      List<Student> students = new List<Student>{};
+
+      while(rdr.Read())
+      {
+        int studentId = rdr.GetInt32(0);
+        string studentName = rdr.GetString(1);
+        string studentEnrollment = rdr.GetString(2);
+        Student newStudent = new Student(studentName, studentEnrollment, studentId);
+        students.Add(newStudent);
+      }
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+      return students;
+    }
+
+    public void AddStudent(Student newStudent)
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"INSERT INTO course_student (course_id, student_id) VALUES (@CourseId, @StudentId);";
+
+      MySqlParameter course_id = new MySqlParameter();
+      course_id.ParameterName = "@CourseId";
+      course_id.Value = _id;
+      cmd.Parameters.Add(course_id);
+
+      MySqlParameter student_id = new MySqlParameter();
+      student_id.ParameterName = "@StudentId";
+      student_id.Value = newStudent.GetId();
+      cmd.Parameters.Add(student_id);
+
+      cmd.ExecuteNonQuery();
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+    }
+
+    public void Delete()
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      MySqlCommand cmd = new MySqlCommand("DELETE FROM course WHERE id = @CourseId; DELETE FROM courses_tasks WHERE course_id = @CourseId;", conn);
+      MySqlParameter courseIdParameter = new MySqlParameter();
+      courseIdParameter.ParameterName = "@CourseId";
+      courseIdParameter.Value = this.GetId();
+
+      cmd.Parameters.Add(courseIdParameter);
+      cmd.ExecuteNonQuery();
+
+      if (conn != null)
+      {
+        conn.Close();
+      }
+    }
+
     public static void DeleteAll()
     {
       MySqlConnection conn = DB.Connection();

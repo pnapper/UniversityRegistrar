@@ -3,7 +3,7 @@
 
 <h1>Student List</h1>
 <h2>Name: @Model["student"].GetName()</h2>
-<h3>Enrolment Date: @Model["student"].GetEnrollment()</h3>
+<h3>Enrollment Date: @Model["student"].GetEnrollment()</h3>
 <hr />
 @if (@Model["studentCourses"].Count != 0)
 {
@@ -11,7 +11,7 @@
   <ul>
     @foreach (var course in @Model["studentCourses"])
     {
-      <li>@course.GetName()</li>
+      <li>@course.GetCourseName()</li>
     }
   </ul>
 }
@@ -21,7 +21,7 @@
   <select id='course-id' name='course-id' type='text'>
     @foreach (var course in @Model["allCourses"])
     {
-      <option value='@course.GetId()'>@course.GetName()</option>
+      <option value='@course.GetId()'>@course.GetCourseName()</option>
     }
   </select>
   <button type='submit'>Add course</button>
